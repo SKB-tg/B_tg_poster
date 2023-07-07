@@ -96,7 +96,7 @@ class SomeMiddleware(BaseMiddleware):
         global List_data_channel_admin
         List_data_channel_admin= inicialisiren_bot(Ch_id, True)
         if data["event_update"].message.photo != None:
-            print(92, Ch_id)
+            #print(92, Ch_id)
         global Curent_Channal
         #Curent_Channal= List_data_channel_admin[0]
 
@@ -148,7 +148,7 @@ class HasAdminStatusFilter(BaseFilter):
                 result = await bot_post.get_chat_administrators(chat_id_as_post)
                 for item in result:
                     if item.user.id == chat.id: ##владелец бота явл. админом канала(группы мегагруппы)
-                        print(75, item.user, chat.id, 7777 )
+                        #print(75, item.user, chat.id, 7777 )
 
                         return True
 
@@ -195,7 +195,7 @@ async def command_start(message: Message, base_url: str = base_url):
     global List_data_channel_admin
     List_data_channel_admin= inicialisiren_bot(message.chat.id, True)
     global Curent_Channal
-    print(169, Curent_Channal, List_data_channel_admin)
+    #print(169, Curent_Channal, List_data_channel_admin)
     Curent_Channal= {}
     #print(89, List_data_channel_admin)
     await message.answer("""Это ваш личный Notepost-бот для подготовки контента, постинга и автоприёма заявок:\n\n
@@ -317,7 +317,7 @@ async def command_addchannel(message: Message):
 async def forward_mess(message: Message):#, channel_managet):
     #print(channel_managet)
     global List_data_channel_admin #= inicialisiren_bot(message.chat.id, True)
-    print(299, message)
+    #print(299, message)
     if is_channel_managet(message.chat.id, message.forward_from_chat.username):
         await message.answer(
        f"""Я уже подключен к этому каналу.\n\n
@@ -333,7 +333,7 @@ async def forward_mess(message: Message):#, channel_managet):
         # ),
         )
     else:
-        print(message.forward_from_chat.username)
+        #print(message.forward_from_chat.username)
         data_channel_admin_new={}
         data_channel_admin_new["username_channel"]=message.forward_from_chat.username
         data_channel_admin_new["id_channel"]=message.forward_from_chat.id
@@ -374,7 +374,7 @@ async def run_repost_plus(callback: CallbackQuery):
     if (Curent_Channal == {}) & (curent_channel_id != ""):
         Curent_Channal.update(cur_channal_admin(curent_channel_id))
         Curent_Channal.update(asu)
-    print(319, Curent_Channal, sufix_full[2], Ch_id)
+    #(319, Curent_Channal, sufix_full[2], Ch_id)
     username_channel=[]
     id_channel=[]
     button=[]
@@ -385,7 +385,7 @@ async def run_repost_plus(callback: CallbackQuery):
             id_channel.append(List_data_channel_admin[n]["id_channel"])
             button.append(InlineKeyboardButton(text=username_channel[n], callback_data=f"repost_create_{id_channel[n]}"))
 
-        print(388, List_data_channel_admin, id_channel, callback.data)
+        #(388, List_data_channel_admin, id_channel, callback.data)
         await callback.message.answer(
             "выбирите канал с которым будете работать",
            reply_markup=InlineKeyboardMarkup(
@@ -463,14 +463,14 @@ async def run_repost_plus(callback: CallbackQuery):
 @m_router.message(Command(commands=["repost_plus"]))  # Echo to all messages except messages via bot
 async def run_repost_plus(message: Message):
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
-    print(266, List_data_channel_source)
+    #(266, List_data_channel_source)
     username_channel=[]
     chat_id=[]
     List_data_channel_admin=inicialisiren_bot(message.chat.id, True)
     for n in List_data_channel_admin:
         username_channel.append(n["username_channel"])
         chat_id.append(n["chat_id"])
-    print(username_channel, chat_id)
+    #(username_channel, chat_id)
     await message.answer(
         "выбирите канал с которым будете работать",
        reply_markup=InlineKeyboardMarkup(
@@ -492,7 +492,7 @@ from aiogram.exceptions import TelegramBadRequest
 @m_router.message(F.forward_from_chat.type == "channel")#, flags={"data_time": {"event": True}})  # Echo to all messages except messages via bot
 async def forward_mess_clone(message: Message, base_url: str=base_url):
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
-    print(474, message)
+    #(474, message)
     for item in List_data_channel_source:
         try:
             if int(item["id_channel"]) != message.forward_from_chat.id:
@@ -508,7 +508,7 @@ async def forward_mess_clone(message: Message, base_url: str=base_url):
     mess=message.text
     mess_channal=message.forward_from_chat
     mess_entity=message.entities
-    print(442, message, 119988 )
+    #print(442, message, 119988 )
     forward_mess_id=message.message_id #message.forward_from_message_id-1
     await message.answer(
     f"""Я получил пост из этого канала @{mess_channal.username}.
@@ -608,7 +608,7 @@ async def run_create(callback: CallbackQuery):
         #if Curent_Channal["id_channel"] != curent_channel_id:
         Curent_Channal.update(cur_channal_admin(curent_channel_id))
         Curent_Channal.update(asu)
-    print(646, Curent_Channal, sufix_full[2])
+    #print(646, Curent_Channal, sufix_full[2])
     username_channel=[]
     id_channel=[]
     button=[]
@@ -619,7 +619,7 @@ async def run_create(callback: CallbackQuery):
             id_channel.append(List_data_channel_admin[n]["id_channel"])
             button.append(InlineKeyboardButton(text=username_channel[n], callback_data=f"post-create_create_{id_channel[n]}"))
 
-        print(654, List_data_channel_admin, id_channel, callback.data)
+        #print(654, List_data_channel_admin, id_channel, callback.data)
         await callback.message.answer(
             "выбирите канал с которым будете работать",
            reply_markup=InlineKeyboardMarkup(
@@ -687,7 +687,7 @@ async def run_create(callback: CallbackQuery):
 
     elif (sufix == "Send") & (curent_channel_id != None):
         #curent_chat_id = callback.data.split("_")[1]
-        print(693, curent_channel_id, callback.message.message_id)
+        #print(693, curent_channel_id, callback.message.message_id)
         await callback.message.copy_to(curent_channel_id, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
         await callback.message.answer(
             text="~ Сообщение успешно отправлено в канал! ~",
@@ -697,7 +697,7 @@ async def run_create(callback: CallbackQuery):
             ])
         )
         Curent_Channal={}
-        print(699,Curent_Channal, curent_channel_id)
+        #print(699,Curent_Channal, curent_channel_id)
 
 
 
@@ -731,7 +731,7 @@ async def echo_all(message: Message):
             data[item.url] = item.extract_from(message.text)
     #**********************************************************
 
-    print(538,Curent_Channal, 999, data)
+    #print(538,Curent_Channal, 999, data)
     # await message.edit_text(" ",
     #     inline_message_id = message.message_id)
     if message.text != None :
@@ -754,7 +754,7 @@ async def echo_all(message: Message):
         new_text=f"{message.message_id}" + str(message2.text)
         file_io: BinaryIO = await bot_post.download(message.photo[-2].file_id)
         url_link_image=upload_image_in_telegraph(file_io)
-        print(697, message.message_id, ) #/file/25b93f3a42027f16c107f.jpg
+        #print(697, message.message_id, ) #/file/25b93f3a42027f16c107f.jpg
 
         entities= [MessageEntity(type='text_link', offset=0, length=1, url=f"https://telegra.ph{url_link_image}", user=None, language=None, custom_emoji_id=None)] #MessageEntity(type='bold', offset=2, length=53, url=None, user=None, language=None, custom_emoji_id=None), MessageEntity(type='italic', offset=320, length=5, url=None, us f'https://telegra.ph/file/{message.photo[-1].file_id}9f0d8.png', user=None, language=None, custom_emoji_id=None)
 
@@ -766,7 +766,7 @@ async def echo_all(message: Message):
         await message.answer_animation(message.animation.file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard(Curent_Channal["id_channel"]))
     elif (message.text != None) & (message.entities.url != None):
 
-        print(756, Curent_Channal["Create_message_id"], message.message_id)
+        #print(756, Curent_Channal["Create_message_id"], message.message_id)
         await bot_post.delete_message(chat.id, message.message_id-1 )
 
         await message.answer(
@@ -818,7 +818,7 @@ async def run_settings(callback: CallbackQuery):
     #     return
     global Curent_Channal
     curent_channel_id=sufix_full[2] if sufix_full[2] != "" else ""
-    print(802, Curent_Channal, sufix_full[2], Ch_id)
+    #print(802, Curent_Channal, sufix_full[2], Ch_id)
     username_channel=[]
     id_channel=[]
     if ((sufix == "clone") & (curent_channel_id == "")) | ((sufix == "create") & (curent_channel_id == "")):
