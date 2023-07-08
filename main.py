@@ -31,7 +31,7 @@ from aiogram.methods.get_file import GetFile
 from aiogram.types.bot_command_scope_all_chat_administrators import BotCommandScopeAllChatAdministrators
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, KeyboardBuilder
 from app.settings import settings
-from service import (scan_all_channals,
+from app.service import (scan_all_channals,
     scan_messages, send_messages, send_message_uan, run_client, save_data_channel, upload_image_in_telegraph,
     inicialisiren_bot, is_channel_managet, read_fileBot, has_channel, find_words, file_info
 )
