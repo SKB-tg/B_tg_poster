@@ -237,7 +237,7 @@ async def send_value2(callback: CallbackQuery):
         List_data_channel_admin= inicialisiren_bot(callback.message.chat.id, True)
     print(235, List_data_channel_admin)
 
-    curent_channel= [] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
+    curent_channel= ["", "", ""] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
     for n in range(len(List_data_channel_admin)):
         curent_channel.append("\n@" + str(List_data_channel_admin[n]["username_channel"]))
     b=curent_channel[1] if len(curent_channel) > 1 else ''
