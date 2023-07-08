@@ -864,7 +864,7 @@ async def run_bot2_backgraund():
     useful_updates = _dispatcher.resolve_used_update_types()
 #     # Запускаем бота и пропускаем все накопленные входящие
 #     # Да, этот метод можно вызвать даже если у вас поллинг
-#     #await bot_post.delete_webhook(drop_pending_updates=True)
+    await bot_post.delete_webhook(drop_pending_updates=True)
     await _dispatcher.start_polling(bot_post, allowed_updates=useful_updates)
 #run_bot2_backgraund()
 #6157538942:AAH9jbktrh2HabWQdrqxAvS7QTwQ3NV2NCU
