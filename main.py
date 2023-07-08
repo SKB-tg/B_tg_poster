@@ -170,7 +170,7 @@ def get_list_button(key: str) -> list:
 #****************************************************
 
 @m_router.message(Command(commands=["start"]))
-async def command_start(message: Message, base_url: str = base_url):
+async def command_start(message: Message):
     await bot_post.set_chat_menu_button(
         chat_id=message.chat.id,
         menu_button=MenuButtonCommands(type="commands"),# "Меню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\nМеню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\n"
@@ -498,7 +498,7 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 
 @m_router.message(F.forward_from_chat.type == "channel")#, flags={"data_time": {"event": True}})  # Echo to all messages except messages via bot
-async def forward_mess_clone(message: Message, base_url: str=base_url):
+async def forward_mess_clone(message: Message):
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
     #(474, message)
     for item in List_data_channel_source:
@@ -781,7 +781,7 @@ async def echo_all(message: Message):
 
 #**************************************************************************
 @m_router.message(((F.text == "Настройки") | (F.Command == "settings"))) #(commands=["settings"])))  
-async def handler_settings(message: Message, base_url: str=base_url):
+async def handler_settings(message: Message):
     k_id=await bot_post.get_me()
     #result: List[Union[ChatMemberOwner, ChatMemberAdministrator, ChatMemberMember, ChatMemberRestricted, ChatMemberLeft, ChatMemberBanned]] = await bot_post.get_chat_administrators("1849731160")
     await message.answer(
