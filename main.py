@@ -61,7 +61,8 @@ Curent_Channal={}
 Create_message_id=[]
 Mode_select_channel_admin=False
 
-def cur_channal_admin(value: Optional[str]=None) -> Union[dict, None]:
+def cur_channal_admin(value: Optional[str]=None) -> Dict:
+    curent_channal={}
     if value == None:
         return List_data_channel_admin[0]
     for item in List_data_channel_admin:
