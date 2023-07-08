@@ -193,9 +193,10 @@ async def command_start(message: Message, base_url: str = base_url):
     global Ch_id
     Ch_id=message.chat.id
     global List_data_channel_admin
-    List_data_channel_admin= inicialisiren_bot(message.chat.id, True)
+    if List_data_channel_admin == []:
+        List_data_channel_admin=inicialisiren_bot(message.chat.id, True)
     global Curent_Channal
-    #print(169, Curent_Channal, List_data_channel_admin)
+    print(169, Curent_Channal, List_data_channel_admin)
     Curent_Channal= {}
     #print(89, List_data_channel_admin)
     await message.answer("""Это ваш личный Notepost-бот для подготовки контента, постинга и автоприёма заявок:\n\n
@@ -232,13 +233,21 @@ async def send_value2(callback: CallbackQuery):
     global Mode_select_channel_admin
     if List_data_channel_admin == []:
         List_data_channel_admin= inicialisiren_bot(callback.message.chat.id, True)
-    curent_channel1=List_data_channel_admin[0]["username_channel"] or ""
-    curent_channel2=List_data_channel_admin[len(List_data_channel_admin)-2]["username_channel"] if len(List_data_channel_admin) > 1 else ""
-    curent_channel3=List_data_channel_admin[len(List_data_channel_admin)-1]["username_channel"] if len(List_data_channel_admin) > 2 else ""
+    print(235, List_data_channel_admin)
+
+    curent_channel= [] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
+    for n in range(len(List_data_channel_admin)):
+        curent_channel.append("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+    b=curent_channel[1] if len(curent_channel) > 1 else ''
+    c=curent_channel[2] if len(curent_channel) > 2 else ''
+    #if List_data_channel_admin != []:
+    # curent_channel1=List_data_channel_admin[n]["username_channel"] or ""
+    # curent_channel2=List_data_channel_admin[len(List_data_channel_admin)-2]["username_channel"] if len(List_data_channel_admin) > 1 else ""
+    # curent_channel3=List_data_channel_admin[len(List_data_channel_admin)-1]["username_channel"] if len(List_data_channel_admin) > 2 else ""
 
     if sufix == "start":
         #print(206, (curent_channel["username_channel"] == ""))
-        if curent_channel1 == "":
+        if curent_channel[0] == "\n@":
             await callback.message.answer(
                 """ __--__\n\nНачните с добавления канала для администрирования\n\n
                 Чтобы добавить канал, вы должны выполнить два следующих шага:\n\n
@@ -249,7 +258,7 @@ async def send_value2(callback: CallbackQuery):
             Mode_select_channel_admin=True
             return
         await callback.message.answer(
-            f"""У вас подключены следующие каналы: @{curent_channel1},\n@{curent_channel2},\n@{curent_channel3},\n они в списке администрируемых каналов. 
+            f"""У вас подключены следующие каналы:{curent_channel[0]}{b}{c}\n они в списке администрируемых каналов. 
                 """,
             reply_markup=get_inline_keyboard2() ,
 
@@ -339,10 +348,10 @@ async def forward_mess(message: Message):#, channel_managet):
         data_channel_admin_new["id_channel"]=message.forward_from_chat.id
         data_channel_admin_new["chat_id"] =message.chat.id
         data_channel_admin_new["is_managet"] =True
-        global Curent_Channal
-        if List_data_channel_admin[0]["chat_id"] == 0:
-            List_data_channel_admin[0]=data_channel_admin_new
-        #Curent_Channal=data_channel_admin_new
+        # global Curent_Channal
+        # if List_data_channel_admin[0]["chat_id"] == 0:
+        #     List_data_channel_admin[0]=data_channel_admin_new
+        # #Curent_Channal=data_channel_admin_new
         List_data_channel_admin.append(data_channel_admin_new)
         res = save_data_channel(data_channel_admin_new)
         #res = save_data_channel(data_channel) if save_data_channel(data_channel) else print("net")
@@ -533,18 +542,6 @@ async def forward_mess_clone(message: Message, base_url: str=base_url):
         with suppress(TelegramBadRequest):
             await message.answer_animation(message.animation.file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard0(curent_channel["id_channel"]))
 
-
-# @m_router.callback_query(Text(startswith="Send_"))
-# async def send_random_value2(callback: CallbackQuery):
-#     curent_chat_id = callback.data.split("_")[1]
-#     await callback.message.copy_to(-1001125700086, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
-#     await callback.message.answer(
-#         text="~ Сообщение успешно отправлено в канал! ~",
-#         #show_alert=True
-#         reply_markup= InlineKeyboardMarkup(inline_keyboard=[
-#         [InlineKeyboardButton(text='🔙 Вернуться', callback_data=f'Continue_start_{curent_chat_id}')], 
-#         ])
-#     )
 
 #********************************************************************
 
