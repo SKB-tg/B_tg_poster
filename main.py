@@ -52,6 +52,7 @@ m_router = Router()
 _dispatcher.include_router( mp_router)
 mp_router.include_router(m_router)
 
+base_url="https://tbf-b1-editor.onrender.com/shop-online/"
 #************************************
 Ch_id=0
 List_data_channel_admin=[]
@@ -147,7 +148,7 @@ class HasAdminStatusFilter(BaseFilter):
                 result = await bot_post.get_chat_administrators(chat_id_as_post)
                 for item in result:
                     if item.user.id == chat.id: ##владелец бота явл. админом канала(группы мегагруппы)
-                        #print(75, item.user, chat.id, 7777 )
+                        print(75, item.user, chat.id, 7777 )
 
                         return True
 
@@ -170,7 +171,7 @@ def get_list_button(key: str) -> list:
 #****************************************************
 
 @m_router.message(Command(commands=["start"]))
-async def command_start(message: Message):
+async def command_start(message: Message, base_url: str = base_url):
     await bot_post.set_chat_menu_button(
         chat_id=message.chat.id,
         menu_button=MenuButtonCommands(type="commands"),# "Меню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\nМеню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\n"
@@ -498,7 +499,7 @@ from contextlib import suppress
 from aiogram.exceptions import TelegramBadRequest
 
 @m_router.message(F.forward_from_chat.type == "channel")#, flags={"data_time": {"event": True}})  # Echo to all messages except messages via bot
-async def forward_mess_clone(message: Message):
+async def forward_mess_clone(message: Message, base_url: str=base_url):
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
     #(474, message)
     for item in List_data_channel_source:
@@ -544,24 +545,24 @@ async def forward_mess_clone(message: Message):
 
 #********************************************************************
 
-# async def show_summary(message: Message, data: List) -> None:
-#     try:
-#         #mess = " \n" + str(message.text).replace(find_words(message.text, "@")[0], "")
-#         message1= await message.send_copy(data[0])
+async def show_summary(message: Message, data: List) -> None:
+    try:
+        #mess = " \n" + str(message.text).replace(find_words(message.text, "@")[0], "")
+        message1= await message.send_copy(data[0])
 
-#         await message.answer(text="mess ok",
-#                 #entities = message.entities,
-#         reply_markup=get_inline_keyboard()
-#         )
-#     except Exception as e:
-#         print(e)
-#     # async def my_middleware(handler, event, data):
-#     # typing = get_flag(data, "typing")  # Check that handler marked with `typing` flag
-#     # if not typing:
-#     #     return await handler(event, data)
+        await message.answer(text="mess ok",
+                #entities = message.entities,
+        reply_markup=get_inline_keyboard()
+        )
+    except Exception as e:
+        print(e)
+    # async def my_middleware(handler, event, data):
+    # typing = get_flag(data, "typing")  # Check that handler marked with `typing` flag
+    # if not typing:
+    #     return await handler(event, data)
 
-#     # async with ChatActionSender.typing(chat_id=event.chat.id):
-#     #     return await handler(event, data)
+    # async with ChatActionSender.typing(chat_id=event.chat.id):
+    #     return await handler(event, data)
 
 
 #*******************************************обработчик creat**************
@@ -781,7 +782,7 @@ async def echo_all(message: Message):
 
 #**************************************************************************
 @m_router.message(((F.text == "Настройки") | (F.Command == "settings"))) #(commands=["settings"])))  
-async def handler_settings(message: Message):
+async def handler_settings(message: Message, base_url: str=base_url):
     k_id=await bot_post.get_me()
     #result: List[Union[ChatMemberOwner, ChatMemberAdministrator, ChatMemberMember, ChatMemberRestricted, ChatMemberLeft, ChatMemberBanned]] = await bot_post.get_chat_administrators("1849731160")
     await message.answer(
@@ -828,12 +829,13 @@ async def run_settings(callback: CallbackQuery):
         await command_addchannel(callback.message)
         #await callback.message.answer()
     elif (sufix == "mychannels"):
-
-        curent_channel1=List_data_channel_admin[0]["username_channel"] or ""
-        curent_channel2=List_data_channel_admin[len(List_data_channel_admin)-2]["username_channel"] if len(List_data_channel_admin) > 1 else ""
-        curent_channel3=List_data_channel_admin[len(List_data_channel_admin)-1]["username_channel"] if len(List_data_channel_admin) > 2 else ""
+        curent_channel= [] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
+        for n in range(len(List_data_channel_admin)):
+            curent_channel.append("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+        b=curent_channel[1] if len(curent_channel) > 1 else ''
+        c=curent_channel[2] if len(curent_channel) > 2 else ''
         await callback.message.answer(
-            f"""У вас подключены следующие каналы: @{curent_channel1},\n@{curent_channel2},\n@{curent_channel3},\n они в списке администрируемых каналов. 
+            f"""У вас подключены следующие каналы:{curent_channel[0]}{b}{c}\n они в списке администрируемых каналов. 
                 """,
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
@@ -864,7 +866,7 @@ async def run_bot2_backgraund():
     useful_updates = _dispatcher.resolve_used_update_types()
 #     # Запускаем бота и пропускаем все накопленные входящие
 #     # Да, этот метод можно вызвать даже если у вас поллинг
-    await bot_post.delete_webhook(drop_pending_updates=True)
+#     #await bot_post.delete_webhook(drop_pending_updates=True)
     await _dispatcher.start_polling(bot_post, allowed_updates=useful_updates)
 #run_bot2_backgraund()
 #6157538942:AAH9jbktrh2HabWQdrqxAvS7QTwQ3NV2NCU
