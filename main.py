@@ -544,24 +544,24 @@ async def forward_mess_clone(message: Message):
 
 #********************************************************************
 
-async def show_summary(message: Message, data: List) -> None:
-    try:
-        #mess = " \n" + str(message.text).replace(find_words(message.text, "@")[0], "")
-        message1= await message.send_copy(data[0])
+# async def show_summary(message: Message, data: List) -> None:
+#     try:
+#         #mess = " \n" + str(message.text).replace(find_words(message.text, "@")[0], "")
+#         message1= await message.send_copy(data[0])
 
-        await message.answer(text="mess ok",
-                #entities = message.entities,
-        reply_markup=get_inline_keyboard()
-        )
-    except Exception as e:
-        print(e)
-    # async def my_middleware(handler, event, data):
-    # typing = get_flag(data, "typing")  # Check that handler marked with `typing` flag
-    # if not typing:
-    #     return await handler(event, data)
+#         await message.answer(text="mess ok",
+#                 #entities = message.entities,
+#         reply_markup=get_inline_keyboard()
+#         )
+#     except Exception as e:
+#         print(e)
+#     # async def my_middleware(handler, event, data):
+#     # typing = get_flag(data, "typing")  # Check that handler marked with `typing` flag
+#     # if not typing:
+#     #     return await handler(event, data)
 
-    # async with ChatActionSender.typing(chat_id=event.chat.id):
-    #     return await handler(event, data)
+#     # async with ChatActionSender.typing(chat_id=event.chat.id):
+#     #     return await handler(event, data)
 
 
 #*******************************************обработчик creat**************
