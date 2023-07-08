@@ -13,5 +13,5 @@ COPY *.py ./
 COPY app ./app
 #COPY createdb.sql ./
 
-ENTRYPOINT ["python", "server.py"]
+ENTRYPOINT ["python", "main.py"]
 
