@@ -52,7 +52,6 @@ m_router = Router()
 _dispatcher.include_router( mp_router)
 mp_router.include_router(m_router)
 
-base_url="https://tbf-b1-editor.onrender.com/shop-online/"
 #************************************
 Ch_id=0
 List_data_channel_admin=[]
