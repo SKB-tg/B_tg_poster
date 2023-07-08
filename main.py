@@ -95,7 +95,7 @@ class SomeMiddleware(BaseMiddleware):
         Ch_id=data["event_update"].message.chat.id
         global List_data_channel_admin
         List_data_channel_admin= inicialisiren_bot(Ch_id, True)
-        if data["event_update"].message.photo != None:
+        #if data["event_update"].message.photo != None:
             #print(92, Ch_id)
         global Curent_Channal
         #Curent_Channal= List_data_channel_admin[0]
