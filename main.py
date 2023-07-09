@@ -190,7 +190,7 @@ async def command_start(message: Message, base_url: str = base_url):
     {"command": "statistic", "description": "статистика"},
     {"command": "help", "description": "помощь"},
     {"command": "start", "description": "рестарт"},
-    {"command": "https://b-tg-poster.onrender.com", "description": "https://b-tg-poster.onrender.com"}] #https://b-tg-poster.onrender.com
+    {"command": "app", "description": "https://b-tg-poster.onrender.com"}] #https://b-tg-poster.onrender.com
 
     await bot_post.set_my_commands(_commands1)
     global Ch_id
