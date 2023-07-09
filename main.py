@@ -679,8 +679,8 @@ async def run_create(callback: CallbackQuery):
         Текущий пост готов к публикации в канал: {Curent_Channal["username_channel"]}\n@{Curent_Channal["username_channel"]}
         """
                 )
-        await bot_post.copy_message(callback.message.chat.id, callback.message.chat.id, callback.message.message_id-1, reply_markup=get_inline_keyboard3(curent_channel_id))
-        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-2 )
+        await bot_post.copy_message(callback.message.chat.id, callback.message.chat.id, callback.message.message_id, reply_markup=get_inline_keyboard3(curent_channel_id))
+        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-1 )
         #await bot_post.delete_message(callback.message.chat.id, callback.message.message_id )
         await callback.answer()
 
