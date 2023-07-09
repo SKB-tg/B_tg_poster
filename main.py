@@ -240,7 +240,7 @@ async def send_value2(callback: CallbackQuery):
 
     curent_channel= ["", "", ""] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
     for n in range(len(List_data_channel_admin)):
-        curent_channel.append("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+        curent_channel[n]=("\n@" + str(List_data_channel_admin[n]["username_channel"]))
     b=curent_channel[1] if len(curent_channel) > 1 else ''
     c=curent_channel[2] if len(curent_channel) > 2 else ''
     #if List_data_channel_admin != []:
@@ -808,7 +808,7 @@ async def handler_settings(message: Message, base_url: str=base_url):
 
 @m_router.callback_query(Text(startswith="settings_"))
 async def run_settings(callback: CallbackQuery):
-    sufix_full=callback.data.split("_")
+    sufix_full=callback.data.split("_") or ""
     sufix = callback.data.split("_")[1]
     #Curent_channel=has_channel(Ch_id, id_channel=sufix_full[2] if sufix_full[2] != None else None)
     #cur_channal_admin(Curent_channel)
@@ -832,9 +832,9 @@ async def run_settings(callback: CallbackQuery):
         await command_addchannel(callback.message)
         #await callback.message.answer()
     elif (sufix == "mychannels"):
-        curent_channel= [] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
+        curent_channel= ['', '', ''] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
         for n in range(len(List_data_channel_admin)):
-            curent_channel.append("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+            curent_channel[n]=("\n@" + str(List_data_channel_admin[n]["username_channel"]))
         b=curent_channel[1] if len(curent_channel) > 1 else ''
         c=curent_channel[2] if len(curent_channel) > 2 else ''
         await callback.message.answer(
