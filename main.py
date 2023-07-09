@@ -52,7 +52,7 @@ m_router = Router()
 _dispatcher.include_router( mp_router)
 mp_router.include_router(m_router)
 
-base_url="https://tbf-b1-editor.onrender.com/shop-online/"
+base_url="https://b-tg-poster.onrender.com"
 #************************************
 Ch_id=0
 List_data_channel_admin=[]
@@ -190,7 +190,7 @@ async def command_start(message: Message, base_url: str = base_url):
     {"command": "statistic", "description": "статистика"},
     {"command": "help", "description": "помощь"},
     {"command": "start", "description": "рестарт"},
-    {"command": "url", "description": "https://b-tg-poster.onrender.com"}] #https://b-tg-poster.onrender.com
+    {"command": "[inline URL](https://b-tg-poster.onrender.com)", "description": "https://b-tg-poster.onrender.com"}] #https://b-tg-poster.onrender.com
 
     await bot_post.set_my_commands(_commands1)
     global Ch_id
@@ -199,10 +199,10 @@ async def command_start(message: Message, base_url: str = base_url):
     if List_data_channel_admin == []:
         List_data_channel_admin=inicialisiren_bot(message.chat.id, True)
     global Curent_Channal
-    print(169, Curent_Channal, List_data_channel_admin)
+    #print(169, Curent_Channal, List_data_channel_admin)
     Curent_Channal= {}
     #print(89, List_data_channel_admin)
-    await message.answer("""Это ваш личный Notepost-бот для подготовки контента, постинга и автоприёма заявок:\n\n
+    await message.answer(f"""Это ваш личный Notepost-бот для подготовки контента, постинга и автоприёма заявок:\n\n
 
 — ChatGPT поможет в генерации текста 🔥\n
 — шаблоны автоматически добавят кнопки, реакции и водяной знак\n
@@ -210,7 +210,7 @@ async def command_start(message: Message, base_url: str = base_url):
 — функция автоповтора обеспечит циклическую публикацию объявлений\n
 — бот автоматически примет заявки, отправит приветствия и сохранит пользователей в базу для дальнейшей рассылки\n
 — NEW: появилась кнопка "репост+" 🔥, позволяющая клонировать посты с любимых каналов\n
-Для начала работы подключите канал или группу:\n
+Для начала работы подключите канал или группу:\n{List_data_channel_admin}
 
 /addchannel – новый канал\n
 /addgroup – новая группа\n
