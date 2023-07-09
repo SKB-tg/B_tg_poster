@@ -372,7 +372,7 @@ async def forward_mess(message: Message):#, channel_managet):
 
 @m_router.callback_query(Text(startswith="repost_"))
 async def run_repost_plus(callback: CallbackQuery):
-    sufix_full=callback.data.split("_")
+    sufix_full=callback.data.split("_") or ['', '', '']
     sufix = callback.data.split("_")[1]
     #Curent_channel=has_channel(Ch_id, id_channel=sufix_full[2] if sufix_full[2] != None else None)
     #cur_channal_admin(Curent_channel)
