@@ -411,18 +411,19 @@ async def run_repost_plus(callback: CallbackQuery):
 
     elif (sufix == "clone") & (curent_channel_id != ""):
         #global Curent_Channal
-        # Curent_Channal=cur_channal_admin(curent_channel_id)
+        Curent_Channal=cur_channal_admin(curent_channel_id)
         # print(384, curent_channel_id, Curent_Channal)
         await callback.message.answer(
                 f"""
-                Для успешного маневра,\n перейдя в канал выберите любое сообщение,\n
+        Я готов приступить к работе\n\nдля опубликования поста в режиме "клонироания"\n
+перейдите в канал выберите любое сообщение,\n
   нажмите на значок переслать, выберите моё имя -\n\n "Cripto-fack" (@cripto_fack_new_bot) и отправте пост."""
             )
     elif (sufix == "create") & (curent_channel_id != ""):
         # Curent_Channal=cur_channal_admin(curent_channel_id)
         await callback.message.answer(
                 f"""
-        мы готовы приступить к работе\n\nдля создания поста.\n
+        Я готов приступить к работе\n\nдля опубликования поста в режиме "клонироания"\n
     отправьте боту то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
      стикеры.""",
         )
