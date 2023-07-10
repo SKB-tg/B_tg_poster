@@ -356,10 +356,8 @@ async def forward_mess(message: Message):#, channel_managet):
         res = save_data_channel(data_channel_admin_new)
         #res = save_data_channel(data_channel) if save_data_channel(data_channel) else print("net")
         await message.answer(
-            f"""Вы добавили канал «{message.forward_from_chat.title}» @{message.forward_from_chat.username} в список администрируемых каналов. 
-            и\nмы готовы приступить к работе\n\nдля создания поста.\n
-    отправьте боту то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
-     стикеры.\n\nA также можете воспользоваться волшебной кнопкой /repost_plus""",
+            f"""Вы добавили канал:\n«{message.forward_from_chat.title}» @{message.forward_from_chat.username}\n
+в список администрируемых каналов. """,
 
             reply_markup=get_inline_keyboard2(),
 
