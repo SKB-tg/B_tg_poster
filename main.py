@@ -12,6 +12,7 @@ from aiogram.types import (
     ReplyKeyboardMarkup,
     InlineKeyboardMarkup,
     MenuButtonCommands,
+    MenuButtonWebApp,
     Message,
     WebAppInfo,
     BotCommand,
@@ -33,7 +34,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, 
 from app.settings import settings
 from app.service import (scan_all_channals,
     scan_messages, send_messages, send_message_uan, run_client, save_data_channel, upload_image_in_telegraph,
-    inicialisiren_bot, is_channel_managet, read_fileBot, has_channel, find_words, file_info
+    inicialisiren_bot, is_channel_managet, read_fileBot, has_channel, find_words, file_info, get_cmozi, save_cmozi
 )
 from aiogram import flags, html
 from aiogram.dispatcher.flags import get_flag
@@ -58,6 +59,7 @@ Ch_id=0
 List_data_channel_admin=[]
 List_data_channel_source=[]
 Curent_Channal={}
+Cmozi=[""]
 Create_message_id=[]
 Mode_select_channel_admin=False
 
@@ -149,7 +151,7 @@ class HasAdminStatusFilter(BaseFilter):
                 result = await bot_post.get_chat_administrators(chat_id_as_post)
                 for item in result:
                     if item.user.id == chat.id: ##владелец бота явл. админом канала(группы мегагруппы)
-                        print(75, item.user, chat.id, 7777 )
+                        #print(75, item.user, chat.id, 7777 )
 
                         return True
 
@@ -159,8 +161,6 @@ class HasAdminStatusFilter(BaseFilter):
                 return False
             return False
 
-# class HasInputTextFilter(BaseFilter):
-#     async def __call__(self, message: Message) -> bool:
 
 #****************************************************
 def get_list_button(key: str) -> list:
@@ -175,7 +175,7 @@ def get_list_button(key: str) -> list:
 async def command_start(message: Message, base_url: str = base_url):
     await bot_post.set_chat_menu_button(
         chat_id=message.chat.id,
-        menu_button=MenuButtonCommands(type="commands"),# "Меню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\nМеню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\n"
+        menu_button=MenuButtonWebApp(text="Open Menu", web_app=WebAppInfo(url=f"{base_url}")),# "Меню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\nМеню\n/newpost     Создать новы пост\n/newdraft     Создать черновой пост\n/newpost     Создать новы пост\n/newpost     Создать новы пост\n/newpost     Создать  новы пост\n"
     )
     #print(message)
     _command1: BotCommand = None
@@ -190,7 +190,7 @@ async def command_start(message: Message, base_url: str = base_url):
     {"command": "statistic", "description": "статистика"},
     {"command": "help", "description": "помощь"},
     {"command": "start", "description": "рестарт"},
-    {"command": "app", "description": "https://b-tg-poster.onrender.com"}] #https://b-tg-poster.onrender.com
+    ] #https://b-tg-poster.onrender.com
 
     await bot_post.set_my_commands(_commands1)
     global Ch_id
@@ -210,14 +210,15 @@ async def command_start(message: Message, base_url: str = base_url):
 — функция автоповтора обеспечит циклическую публикацию объявлений\n
 — бот автоматически примет заявки, отправит приветствия и сохранит пользователей в базу для дальнейшей рассылки\n
 — NEW: появилась кнопка "репост+" 🔥, позволяющая клонировать посты с любимых каналов\n
-Для начала работы подключите канал или группу:\n{List_data_channel_admin}
+Для начала работы подключите канал или группу:
 
 /addchannel – новый канал\n
 /addgroup – новая группа\n
 /repost_plus - команда кланирующая пост\n
 Если что-то непонятно:\n
 
-/help – полезная информация и техподдержка""",
+/help – полезная информация и техподдержка\n
+/start - рестарт""",
         reply_markup=get_reply_keyboard()
 
      )
@@ -240,7 +241,7 @@ async def send_value2(callback: CallbackQuery):
 
     curent_channel= ["", "", ""] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
     for n in range(len(List_data_channel_admin)):
-        curent_channel[n]=("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+        curent_channel[n]=  "" + "\n@" + str(List_data_channel_admin[n]["username_channel"])
     b=curent_channel[1] if len(curent_channel) > 1 else ''
     c=curent_channel[2] if len(curent_channel) > 2 else ''
     #if List_data_channel_admin != []:
@@ -249,8 +250,8 @@ async def send_value2(callback: CallbackQuery):
     # curent_channel3=List_data_channel_admin[len(List_data_channel_admin)-1]["username_channel"] if len(List_data_channel_admin) > 2 else ""
 
     if sufix == "start":
-        #print(206, (curent_channel["username_channel"] == ""))
-        if curent_channel[0] == "\n@":
+        print(206, curent_channel[0])
+        if (curent_channel[0] == "\n@") | (curent_channel[0] == ''):
             await callback.message.answer(
                 """ __--__\n\nНачните с добавления канала для администрирования\n\n
                 Чтобы добавить канал, вы должны выполнить два следующих шага:\n\n
@@ -316,9 +317,9 @@ async def command_addchannel(message: Message):
     global Mode_select_channel_admin
     Mode_select_channel_admin=True
     await message.answer(
-        """Добавление канала\n\n
+        """Добавление канала\n
 
-Чтобы добавить канал, вы должны выполнить два следующих шага:\n\n
+Чтобы добавить канал, вы должны выполнить два следующих шага:\n
 
 1. Добавьте @cripto_fack_new_bot в администраторы вашего канала.\n
 2. Перешлите мне любое сообщение из вашего канала (вы также можете отправить @username или Group ID)""",  ##(https://telegra.ph/How-to-add-a-chat-Controller-FAQ-10-12)
@@ -338,11 +339,7 @@ async def forward_mess(message: Message):#, channel_managet):
      стикеры.\n\nA также можете воспользоваться волшебной кнопкой /repost_plus
 """,
         reply_markup=get_inline_keyboard2() ,
-               # reply_markup=InlineKeyboardMarkup(
-        #     inline_keyboard=[
-        #         [InlineKeyboardButton(text="Репост+", callback_data="repost_plus")]
-        #     ]
-        # ),
+
         )
     else:
         #print(message.forward_from_chat.username)
@@ -454,9 +451,10 @@ async def run_repost_plus(callback: CallbackQuery):
                 )
     elif (sufix == "Send") & (curent_channel_id != None):
         #curent_chat_id = callback.data.split("_")[1]
-        await callback.message.copy_to(curent_channel_id, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+        await bot_post.copy_message( curent_channel_id, callback.message.chat.id, callback.message.message_id-1, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+        #await callback.message.copy_to(curent_channel_id, answer_to_message_id=callback.message.message_id-2, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
         await callback.message.answer(
-            text="~ Сообщение успешно отправлено в канал! ~",
+            text=f"~ Сообщение успешно отправлено в канал! ~",
             #show_alert=True
             reply_markup= InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text='🔙 Вернуться', callback_data=f'Continue_start_{curent_channel_id}')], 
@@ -504,7 +502,7 @@ from aiogram.exceptions import TelegramBadRequest
 @m_router.message(F.forward_from_chat.type == "channel")#, flags={"data_time": {"event": True}})  # Echo to all messages except messages via bot
 async def forward_mess_clone(message: Message, base_url: str=base_url):
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
-    #(474, message)
+    (474, message)
     for item in List_data_channel_source:
         try:
             if int(item["id_channel"]) != message.forward_from_chat.id:
@@ -522,50 +520,33 @@ async def forward_mess_clone(message: Message, base_url: str=base_url):
     mess_entity=message.entities
     #print(442, message, 119988 )
     forward_mess_id=message.message_id #message.forward_from_message_id-1
-    await message.answer(
-    f"""Я получил пост из этого канала @{mess_channal.username}.
-    """)
+
     global Curent_Channal
     curent_channel=Curent_Channal
+    id_channel='@' + curent_channel["username_channel"]
+    id_channel_source=message.chat.id
     if (message.photo == None) & (message.animation == None):
-        id_channel='@' + curent_channel["username_channel"]
-        id_channel_source=message.chat.id #'@' + data_curent_channel["username_channel"]
         sim=find_words(str(mess), "@")
         sim1 = sim[0] if sim != [""] else ""
         #print(sim1, message.photo,33333 , message.caption)
         mess = str(mess).replace(str(sim1), "").replace("|", '')
 
-        await message.answer(text=mess, entities=mess_entity, reply_markup=get_inline_keyboard0(curent_channel["id_channel"]))
+        await message.answer(text=mess, entities=mess_entity, reply_markup=InlineKeyboardMarkup(inline_keyboard=[])) # get_inline_keyboard0(curent_channel["id_channel"]))
+
     elif message.photo != None :
         #await show_summary(message=message, data=[id_channel, id_channel_source, forward_mess_id])
         with suppress(TelegramBadRequest):
-            await message.answer_photo(message.photo[-1].file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard0(curent_channel["id_channel"]))
+            await message.answer_photo(message.photo[-1].file_id, caption=message.caption + f"{message.message_id}", caption_entities=message.caption_entities, reply_markup=InlineKeyboardMarkup(inline_keyboard=[])) # get_inline_keyboard0(curent_channel["id_channel"]))
 
     elif message.animation != None :
         with suppress(TelegramBadRequest):
             await message.answer_animation(message.animation.file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard0(curent_channel["id_channel"]))
+    await message.answer(
+    f"""Я получил этот {get_cmozi()[0][1:2]} пост из канала @{mess_channal.username}\nи он готов к публикации (к-во - 1) в\n{id_channel} 
+    """,
+    reply_markup=get_inline_keyboard0(curent_channel["id_channel"])
+    )
 
-
-#********************************************************************
-
-async def show_summary(message: Message, data: List) -> None:
-    try:
-        #mess = " \n" + str(message.text).replace(find_words(message.text, "@")[0], "")
-        message1= await message.send_copy(data[0])
-
-        await message.answer(text="mess ok",
-                #entities = message.entities,
-        reply_markup=get_inline_keyboard()
-        )
-    except Exception as e:
-        print(e)
-    # async def my_middleware(handler, event, data):
-    # typing = get_flag(data, "typing")  # Check that handler marked with `typing` flag
-    # if not typing:
-    #     return await handler(event, data)
-
-    # async with ChatActionSender.typing(chat_id=event.chat.id):
-    #     return await handler(event, data)
 
 
 #*******************************************обработчик creat**************
@@ -608,7 +589,7 @@ async def run_create(callback: CallbackQuery):
         #if Curent_Channal["id_channel"] != curent_channel_id:
         Curent_Channal.update(cur_channal_admin(curent_channel_id))
         Curent_Channal.update(asu)
-    #print(646, Curent_Channal, sufix_full[2])
+    print(646, Curent_Channal, sufix_full[2])
     username_channel=[]
     id_channel=[]
     button=[]
@@ -630,7 +611,7 @@ async def run_create(callback: CallbackQuery):
     elif (sufix == "media") & (curent_channel_id != None):
         #Curent_Channal=cur_channal_admin(curent_channel_id)
         await callback.message.answer(
-            text=f"Вышлите медиафайл {callback.message.message_id}",
+            text=f"Вышлите медиафайл",
             #show_alert=True
         )
     elif (sufix == "edit") & (curent_channel_id != ""):
@@ -647,7 +628,7 @@ async def run_create(callback: CallbackQuery):
                 f"""
         мы готовы приступить к работе\n\nдля создания поста.\n
     отправьте боту то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
-     стикеры.{callback.message.message_id}""",
+     стикеры.""",
         )
 
     elif (sufix == "delete") & (curent_channel_id != ""):
@@ -656,12 +637,12 @@ async def run_create(callback: CallbackQuery):
         вы хотите удалить текущий пост?\n
         """,
         reply_markup= InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text='Подтвердите', callback_data=f'repost_okdelete_{curent_channel_id}')],
+        [InlineKeyboardButton(text='Подтвердите', callback_data=f'post-create_okdelete_{curent_channel_id}')],
         ])
         )
-    elif (sufix == "okdelete") & (sufix_full[2] != None):
-        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-4 )
-        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-3 )
+    elif (sufix == "okdelete") & (curent_channel_id != ""):
+        #await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-5 )
+        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-4)
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-2 )
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-1 )
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id )
@@ -674,13 +655,16 @@ async def run_create(callback: CallbackQuery):
                 )
     elif (sufix == "continue") & (curent_channel_id != ""):
         #print(message.message_id)
+
+        await bot_post.copy_message( callback.message.chat.id, callback.message.chat.id, callback.message.message_id, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id )
         await callback.message.answer(
                 f"""
-        Текущий пост готов к публикации в канал: {Curent_Channal["username_channel"]}\n@{Curent_Channal["username_channel"]}
-        """
+        Текущий пост {get_cmozi()[0][1:2]} готов к публикации в канал: {Curent_Channal["username_channel"]}\n@{Curent_Channal["username_channel"]}
+        """,
+        reply_markup=get_inline_keyboard3(curent_channel_id)
                 )
-        await bot_post.copy_message(callback.message.chat.id, callback.message.chat.id, callback.message.message_id, reply_markup=get_inline_keyboard3(curent_channel_id))
-        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-1 )
+
         #await bot_post.delete_message(callback.message.chat.id, callback.message.message_id )
         await callback.answer()
 
@@ -688,7 +672,8 @@ async def run_create(callback: CallbackQuery):
     elif (sufix == "Send") & (curent_channel_id != None):
         #curent_chat_id = callback.data.split("_")[1]
         #print(693, curent_channel_id, callback.message.message_id)
-        await callback.message.copy_to(curent_channel_id, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+        await bot_post.copy_message( curent_channel_id, callback.message.chat.id, callback.message.message_id-1, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
+        #await callback.message.copy_to(curent_channel_id, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]))
         await callback.message.answer(
             text="~ Сообщение успешно отправлено в канал! ~",
             #show_alert=True
@@ -703,20 +688,11 @@ async def run_create(callback: CallbackQuery):
 
 
 ##**********************************обработчик
-# @m_router.message(F.message)  # Echo to all messages except messages via bot
-# async def echo_all(message: Message, base_url: str=base_url):
-#     print(582,message.text, 777, Ch_id)
 
-# @m_router.callback_query()
-# async def hengler_post(callback: CallbackQuery):
-#     await callback.answer(
-#         "Получил ---- callback_query",
-#         show_alert=True
-#     )
-
-@m_router.message(~F.message & ((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика")))  # Echo to all messages except messages via bot
+@m_router.message(~F.message & ((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика")))# & (F.text.startswith("/") == False) ))  # Echo to all messages except messages via bot
 async def echo_all(message: Message):
     global Curent_Channal
+    global Cmozi
     global Create_message_id
     global message2
     #*********************************************************************
@@ -730,17 +706,18 @@ async def echo_all(message: Message):
         if item.url != None:
             data[item.url] = item.extract_from(message.text)
     #**********************************************************
-
+    print("прилетело сюда", Curent_Channal)
     #print(538,Curent_Channal, 999, data)
     # await message.edit_text(" ",
     #     inline_message_id = message.message_id)
     if message.text != None :
         Create_message_id.append(str(message.message_id))
-        #Create_message_id.append(message.text)
         message2 = message #await message.send_copy(Ch_id)
-        print("прилетело сюда", message.message_id)
-        #await bot_post.delete_message(Ch_id, message.message_id-1 )
-
+        # можно удалить 3 str
+        # t=str(message.text)
+        # Cmozi[0]=t[:10] if len(t) < 11 else ""
+        # save_cmozi(Cmozi[0])
+        # print(757, t)
         await message.answer(
             message.text,
             reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"])
@@ -751,7 +728,7 @@ async def echo_all(message: Message):
         #with suppress(TelegramBadRequest):
         #await bot_post.copy_message(Ch_id)
         #message2: Message =await message.send_copy(Ch_id)
-        new_text=f"{message.message_id}" + str(message2.text)
+        new_text="\u200b" + str(message2.text)
         file_io: BinaryIO = await bot_post.download(message.photo[-2].file_id)
         url_link_image=upload_image_in_telegraph(file_io)
         #print(697, message.message_id, ) #/file/25b93f3a42027f16c107f.jpg
@@ -763,10 +740,10 @@ async def echo_all(message: Message):
 
     elif message.animation != None :
         # with suppress(TelegramBadRequest):
-        await message.answer_animation(message.animation.file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard(Curent_Channal["id_channel"]))
+        await message.answer_animation(message.animation.file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"]))
     elif (message.text != None) & (message.entities.url != None):
 
-        #print(756, Curent_Channal["Create_message_id"], message.message_id)
+        print(756, Curent_Channal["Create_message_id"], message.message_id)
         await bot_post.delete_message(chat.id, message.message_id-1 )
 
         await message.answer(
@@ -774,14 +751,6 @@ async def echo_all(message: Message):
             reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"])
         )
 
-
-
-    # await message.answer(
-    #     "Эти функции пока не работают,\nт. к. находятся в разработке!",
-    #     reply_markup= InlineKeyboardMarkup(inline_keyboard=[
-    #     [InlineKeyboardButton(text='🔙 Вернуться', callback_data=f'Continue_start')], 
-    #     ])
-    # )
 
 #**************************************************************************
 @m_router.message(((F.text == "Настройки") | (F.Command == "settings"))) #(commands=["settings"])))  
@@ -791,11 +760,6 @@ async def handler_settings(message: Message, base_url: str=base_url):
     await message.answer(
        f"""Вы находитесь в разделе общих настроек.\nВыберите, что хотите настроить.\nЕсли что-то непонятно,\nотправьте команду
 /help\n\u200b """,
-        # reply_markup=InlineKeyboardMarkup(
-        # inline_keyboard=[[InlineKeyboardButton(text="Создать ст"), InlineKeyboardButton(text="план")],
-        # [InlineKeyboardButton(text="Изменить пост"), InlineKeyboardButton(text="Статика")],
-        #  [InlineKeyboardButton(text="Заети"), InlineKeyboardButton(text="Настки")]],
-        #  ),
         reply_markup=InlineKeyboardMarkup(
             inline_keyboard=[
             [InlineKeyboardButton(text='Мои каналы', callback_data=f'settings_mychannels_'), 
@@ -846,7 +810,15 @@ async def run_settings(callback: CallbackQuery):
             ]
         ),
                 )
-
+#**********************Button  Заметки*******************
+@m_router.message(F.text == "Заметки")  # Echo to all messages except messages via bot
+async def echo_all(message: Message):
+    global Cmozi
+    t=str(get_cmozi())
+    print(582,t, 777, Cmozi)
+    await message.answer(
+        f"""Этот функционал находиться в доработке.{t} 
+            """)
 #***********************************************
 
 # app = FastAPI(title=settings.APP_TITLE)

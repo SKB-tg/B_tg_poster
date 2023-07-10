@@ -45,7 +45,7 @@ def find_words(text: str, symbol):# -> list:
 	#text=str(text).replace("|", ' ') 
 	text=text.replace("\n", ' ')
 	print(36, text, symbol)
-	matches = re.findall(fr'{symbol}\w+\s|\?', text)
+	matches = re.findall(fr'{symbol}\w+\s', text)
 	#matches = pattern.findall(text) if pattern.findall(text) else [""]  
 	print(40, )
 	matches = matches if matches else [""]  
@@ -252,6 +252,7 @@ def read_fileBot(chat_id,*arg) -> List:
 		#cont1.pop()
 	print(224, cont1,)
 	return cont1[1:]
+
 def has_channel(chat_id, username_channel: Optional[str]=None, id_channel: Optional[int]=None) -> Union[dict, None]:
 	has_channel = read_fileBot(chat_id, username_channel)
 	if has_channel:
@@ -270,6 +271,31 @@ def save_data_channel(data ):
 	result = write_to_fileBot(data, name_file)
 	return result
 
+def get_cmozi() -> List:
+	try:
+		with open(f'app/Cmozi.txt', 'r', encoding="utf-8") as fp:
+			cont = fp.readlines() 
+	except Exception as e:
+		print(e)
+		return None
+	cont1=[]
+	print(282, cont)
+	for x in range(len(cont)):
+		y=cont[x] #+ ";" + " .."#.replace('\n', "").strip()
+		cont1.append(y)
+	return cont1
+def save_cmozi(data: str, ):
+	try:
+		#text = '"'+str(pprint.pformat(data))+'"'
+		text = str(data) +"\n"
+		with open(f'app/Cmozi.txt', 'w+', encoding="utf-8") as f:
+		# Считать содержимое файла и отправить его в ответе 
+			f.write(text)
+		  # f.write("\n") 
+		return True#data={'m
+	except Exception as e:
+		print(e)
+		return False
 
 def write_to_fileBot(data: dict, name_file: str):
 	try:
