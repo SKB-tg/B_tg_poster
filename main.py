@@ -331,6 +331,8 @@ async def forward_mess(message: Message):#, channel_managet):
     #print(channel_managet)
     global List_data_channel_admin #= inicialisiren_bot(message.chat.id, True)
     #print(299, message)
+    global Mode_select_channel_admin
+    Mode_select_channel_admin=False
     if is_channel_managet(message.chat.id, message.forward_from_chat.username):
         await message.answer(
        f"""Я уже подключен к этому каналу.\n\n
