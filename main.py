@@ -623,11 +623,11 @@ async def run_create(callback: CallbackQuery):
         #     inline_message_id = callback.message.message_id-2)
 
     elif (sufix == "create") & (curent_channel_id != ""):
-        #Curent_Channal=cur_channal_admin(curent_channel_id)
+        Curent_Channal=cur_channal_admin(curent_channel_id)
         await callback.message.answer(
                 f"""
-        мы готовы приступить к работе\n\nдля создания поста.\n
-    отправьте боту то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
+        я готов приступить к работе\n\nдля создания поста.\n
+    отправьте мне то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
      стикеры.""",
         )
 
