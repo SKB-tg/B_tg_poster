@@ -52,7 +52,7 @@ m_router = Router()
 
 _dispatcher.include_router( mp_router)
 mp_router.include_router(m_router)
-
+message2=None
 base_url="https://b-tg-poster.onrender.com"
 #************************************
 Ch_id=0
@@ -548,7 +548,7 @@ async def forward_mess_clone(message: Message, base_url: str=base_url):
 
 
 #*******************************************обработчик creat**************
-def get_inline_keyboard_creat(curent_channel_id: Optional[str] = ""):
+def get_inline_keyboard_creat(curent_channel_id: Optional[str] = "", delet: Optional[int] = 0):
     buttons =[
             [InlineKeyboardButton(text="Прикрепить медиафайл", callback_data=f"post-create_media_{curent_channel_id}")],
             [InlineKeyboardButton(text="Добавить комментарии", callback_data="post-create_plus"),
@@ -558,6 +558,10 @@ def get_inline_keyboard_creat(curent_channel_id: Optional[str] = ""):
             [InlineKeyboardButton(text="Удалить сообщение", callback_data=f"post-create_delete_{curent_channel_id}"),
             InlineKeyboardButton(text="Далее", callback_data=f"post-create_continue_{curent_channel_id}")]
         ]
+    print(561, delet)
+    if delet != 0:
+        buttons.pop(delet-1)
+        print(buttons)
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 
@@ -624,9 +628,8 @@ async def run_create(callback: CallbackQuery):
         Curent_Channal=cur_channal_admin(curent_channel_id)
         await callback.message.answer(
                 f"""
-        я готов приступить к работе\n\nдля создания поста.\n
-    отправьте мне то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже
-     стикеры.""",
+        я готов приступить к работе\n\nдля публикации в режиме "создания" поста.\n
+отправьте мне то, что хотите опубликовать. Это может быть всё, что угодно – текст, фото, видео, даже, стикеры.""",
         )
 
     elif (sufix == "delete") & (curent_channel_id != ""):
@@ -646,7 +649,7 @@ async def run_create(callback: CallbackQuery):
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id )
 
         await callback.message.answer(
-            f""" ` _ _ ~ Сообщения удалены. Можно продолжать. ~ _ _ `
+            f""" `~ Сообщения удалены. Можно продолжать. ~`
                 """,
             reply_markup=get_inline_keyboard2() ,
 
@@ -708,6 +711,9 @@ async def echo_all(message: Message):
     #print(538,Curent_Channal, 999, data)
     # await message.edit_text(" ",
     #     inline_message_id = message.message_id)
+    if Curent_Channal == {}:
+        Curent_Channal["id_channel"]=""
+
     if message.text != None :
         Create_message_id.append(str(message.message_id))
         message2 = message #await message.send_copy(Ch_id)
@@ -721,19 +727,19 @@ async def echo_all(message: Message):
             reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"])
         )
 
-    elif (message.photo != None) & (message.text == None):
-        #await show_summary(message=message, data=[id_channel, id_channel_source, forward_mess_id])
-        #with suppress(TelegramBadRequest):
-        #await bot_post.copy_message(Ch_id)
-        #message2: Message =await message.send_copy(Ch_id)
-        new_text="\u200b" + str(message2.text)
-        file_io: BinaryIO = await bot_post.download(message.photo[-2].file_id)
-        url_link_image=upload_image_in_telegraph(file_io)
-        #print(697, message.message_id, ) #/file/25b93f3a42027f16c107f.jpg
+    elif (message.photo != None):
+        if message2 == None:
+            await message.copy_to(message.chat.id, reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"], delet=1))
+            #await message.answer(text="\u200b", photo= message.photo[-1].file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"]))
+        if message2 != None:
+            new_text="\u200b" + str(message2.text)
+            file_io: BinaryIO = await bot_post.download(message.photo[-2].file_id)
+            url_link_image=upload_image_in_telegraph(file_io)
+            print(697, message.message_id, ) #/file/25b93f3a42027f16c107f.jpg
 
-        entities= [MessageEntity(type='text_link', offset=0, length=1, url=f"https://telegra.ph{url_link_image}", user=None, language=None, custom_emoji_id=None)] #MessageEntity(type='bold', offset=2, length=53, url=None, user=None, language=None, custom_emoji_id=None), MessageEntity(type='italic', offset=320, length=5, url=None, us f'https://telegra.ph/file/{message.photo[-1].file_id}9f0d8.png', user=None, language=None, custom_emoji_id=None)
+            entities= [MessageEntity(type='text_link', offset=0, length=1, url=f"https://telegra.ph{url_link_image}", user=None, language=None, custom_emoji_id=None)] 
 
-        await message.answer(text=new_text, entities=entities, disable_web_page_preview=False, reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"]))
+            await message.answer(text=new_text, entities=entities, disable_web_page_preview=False, reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"], delet=1))
         #await message.answer(text=Create_message_id[1], photo= message.photo[-1].file_id, caption=message.caption, caption_entities=message.caption_entities, reply_markup=get_inline_keyboard(Create_message_id[0]))
 
     elif message.animation != None :
