@@ -19,9 +19,8 @@ from aiogram.types import (
     MessageEntity,
     Update,
     
-
-
 )
+import dataclasses
 from aiogram.types.callback_query import CallbackQuery
 from aiogram.filters.text import Text
 from aiogram.methods.copy_message import CopyMessage
@@ -32,9 +31,9 @@ from aiogram.methods.get_file import GetFile
 from aiogram.types.bot_command_scope_all_chat_administrators import BotCommandScopeAllChatAdministrators
 from aiogram.utils.keyboard import InlineKeyboardBuilder, ReplyKeyboardBuilder, KeyboardBuilder
 from app.settings import settings
-from app.service import (scan_all_channals,
-    scan_messages, send_messages, send_message_uan, run_client, save_data_channel, upload_image_in_telegraph,
-    inicialisiren_bot, is_channel_managet, read_fileBot, has_channel, find_words, file_info, get_cmozi, save_cmozi
+from app.service import (
+    save_data_channel, upload_image_in_telegraph,
+    inicialisiren_bot, is_channel_managet, find_words, get_cmozi, save_cmozi
 )
 from aiogram import flags, html
 from aiogram.dispatcher.flags import get_flag
@@ -47,15 +46,16 @@ bot_post = Bot(settings.TELEBOT_BOT_TOKEN)
 #print(ACCESS_ID)
 
 _dispatcher=Dispatcher()
-mp_router = Router()
+#mp_router = Router()
 m_router = Router()
 
-_dispatcher.include_router( mp_router)
-mp_router.include_router(m_router)
+_dispatcher.include_router( m_router)
+#mp_router.include_router(m_router)
 message2=None
 base_url="https://b-tg-poster.onrender.com"
 #************************************
 Ch_id=0
+Promo="555m"
 List_data_channel_admin=[]
 List_data_channel_source=[]
 Curent_Channal={}
@@ -68,13 +68,13 @@ def cur_channal_admin(value: Optional[str]=None) -> Dict:
     if value == None:
         return List_data_channel_admin[0]
     for item in List_data_channel_admin:
-        if int(item["id_channel"]) == int(value):
-            curent_channal=item
+        if int(item.id_channel) == int(value):
+            curent_channal=item.dict()
             return curent_channal
     #return None
 
-async def restart(messs):
-    await command_start(messs)
+# async def restart(messs):
+#     await command_start(messs)
 
 
 #************************************************
@@ -83,6 +83,8 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject, Message, input_text_message_content
 from aiogram.methods.get_chat_administrators import GetChatAdministrators
 from aiogram.types.input_text_message_content import InputTextMessageContent
+
+from app.models import get_tguser, add_tg_user
 
 
 
@@ -95,12 +97,26 @@ class SomeMiddleware(BaseMiddleware):
     ) -> Any:
         data_time = get_flag(data, "data_time")
         global Ch_id
+        global user_curent
+        global Promo
+        Promo="555m"
         Ch_id=data["event_update"].message.chat.id
         global List_data_channel_admin
         List_data_channel_admin= inicialisiren_bot(Ch_id, True)
-        #if data["event_update"].message.photo != None:
-            #print(92, Ch_id)
-        global Curent_Channal
+        username=data['event_from_user'].first_name
+        user_data=dict(data['event_from_user'])
+
+        if username != None:
+            user_curent=get_tguser(username)
+            #print(92, user_data, user_db, event.text)
+            if user_curent == None:
+                await event.answer('Доступ закрыт, вход невозможен,\nЕсли у вас есть промокод Введите сейчас для входа\n4-ре символа промокода(пример - "/promo:555m")', 
+                )
+                if (event.text[:7] == "/promo:") & (event.text[7:] == Promo):
+                    await event.answer('Доступ открыт,\nперезапуститесь командой /start')
+                    user_curent=add_tg_user(user_data)
+                return
+        #global Curent_Channal
         #Curent_Channal= List_data_channel_admin[0]
 
         # chat_id_as_post1: Union[List, None] = data["event_update"].message.forward_from_chat
@@ -120,9 +136,9 @@ class SomeMiddleware(BaseMiddleware):
         # #f_channal()
         #     print(61, data_time)# data["channal_"]
         # # event.forward_from_chat.type="channel_managet"
-        return await handler(event, data)
+            return await handler(event, data)
 
-m_router.message.middleware(SomeMiddleware())
+m_router.message.outer_middleware(SomeMiddleware())
 
 #****************************************************
 class SomeRouterPostMiddleware(BaseMiddleware):
@@ -136,7 +152,7 @@ class SomeRouterPostMiddleware(BaseMiddleware):
         
         return await handler(event, data)
 
-mp_router.channel_post.outer_middleware(SomeRouterPostMiddleware())
+m_router.channel_post.outer_middleware(SomeRouterPostMiddleware())
 #****************************************************
 
 class HasAdminStatusFilter(BaseFilter):
@@ -235,13 +251,14 @@ async def send_value2(callback: CallbackQuery):
     sufix = callback.data.split("_")[1]
     global List_data_channel_admin
     global Mode_select_channel_admin
+    global user_curent
     if List_data_channel_admin == []:
         List_data_channel_admin= inicialisiren_bot(callback.message.chat.id, True)
-    print(235, List_data_channel_admin)
+    print(235, List_data_channel_admin, user_curent.codename)
 
     curent_channel= ["", "", ""] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
     for n in range(len(List_data_channel_admin)):
-        curent_channel[n]=  "" + "\n@" + str(List_data_channel_admin[n]["username_channel"])
+        curent_channel[n]=  "" + "\n@" + str(List_data_channel_admin[n].username_channel)
     b=curent_channel[1] if len(curent_channel) > 1 else ''
     c=curent_channel[2] if len(curent_channel) > 2 else ''
     #if List_data_channel_admin != []:
@@ -313,7 +330,6 @@ def get_inline_keyboard0(curent_channel_id: Optional[str] = ""):
 
 @m_router.message(((F.text == "addchannel_") | (F.Command == "addchannel"))) #(Command(commands=["addchannel"]))
 async def command_addchannel(message: Message):
-    #list_channel=read_fileBot()
     global Mode_select_channel_admin
     Mode_select_channel_admin=True
     await message.answer(
@@ -333,7 +349,7 @@ async def forward_mess(message: Message):#, channel_managet):
     #print(299, message)
     global Mode_select_channel_admin
     Mode_select_channel_admin=False
-    if is_channel_managet(message.chat.id, message.forward_from_chat.username):
+    if is_channel_managet(message.chat.id, message.forward_from_chat.id):
         await message.answer(
        f"""Я уже подключен к этому каналу.\n\n
             Теперь мы готовы приступить к работе\n\nдля создания поста.\n
@@ -601,8 +617,8 @@ async def run_create(callback: CallbackQuery):
     if (sufix == "create") & (curent_channel_id == ""):
         #List_data_channel_admin=inicialisiren_bot(message.chat.id, True)
         for n in range(len(List_data_channel_admin)):
-            username_channel.append(List_data_channel_admin[n]["username_channel"])
-            id_channel.append(List_data_channel_admin[n]["id_channel"])
+            username_channel.append(List_data_channel_admin[n].username_channel)
+            id_channel.append(List_data_channel_admin[n].id_channel)
             button.append(InlineKeyboardButton(text=username_channel[n], callback_data=f"post-create_create_{id_channel[n]}"))
 
         #print(654, List_data_channel_admin, id_channel, callback.data)
@@ -693,7 +709,7 @@ async def run_create(callback: CallbackQuery):
 
 ##**********************************обработчик
 
-@m_router.message(~F.message & ((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика")))# & (F.text.startswith("/") == False) ))  # Echo to all messages except messages via bot
+@m_router.message(~F.message & ((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика") & (F.text[:6] != "/promo") ))  # Echo to all messages except messages via bot
 async def echo_all(message: Message):
     global Curent_Channal
     global Cmozi
@@ -805,7 +821,7 @@ async def run_settings(callback: CallbackQuery):
     elif (sufix == "mychannels"):
         curent_channel= ['', '', ''] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
         for n in range(len(List_data_channel_admin)):
-            curent_channel[n]=("\n@" + str(List_data_channel_admin[n]["username_channel"]))
+            curent_channel[n]=("\n@" + str(List_data_channel_admin[n].username_channel))
         b=curent_channel[1] if len(curent_channel) > 1 else ''
         c=curent_channel[2] if len(curent_channel) > 2 else ''
         await callback.message.answer(
