@@ -31,3 +31,4 @@ ujson==5.7.0
 urllib3==1.26.16
 uvicorn==0.18.3
 yarl==1.9.2
+pytz
