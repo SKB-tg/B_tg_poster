@@ -65,7 +65,7 @@ def inicialisiren_bot(chat_id1: dict, is_managet: Optional[bool], bot: Optional=
 	channels=get_channels(chat_id1)
 	if channels != None:
 		channels_bot_admin=[i for i in channels if i.is_managet == is_managet]
-		print(68, channels_bot_admin)
+		#print(68, channels_bot_admin)
 		# if channel.is_managet == is_managet:
 		# 	channels_bot_admin.append(channel)
 		# 	return channels_bot_admin

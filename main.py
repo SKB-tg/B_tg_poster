@@ -104,11 +104,12 @@ class SomeMiddleware(BaseMiddleware):
         global List_data_channel_admin
         List_data_channel_admin= inicialisiren_bot(Ch_id, True)
         username=data['event_from_user'].first_name
+        id_=data['event_from_user'].id
         user_data=dict(data['event_from_user'])
-
-        if username != None:
+        print(data['event_from_user'].id, event.photo)
+        if id_ != None:
             user_curent=get_tguser(username)
-            #print(92, user_data, user_db, event.text)
+            print(92, user_data, user_curent)
             if user_curent == None:
                 await event.answer('Доступ закрыт, вход невозможен,\nЕсли у вас есть промокод Введите сейчас для входа\n4-ре символа промокода(пример - "/promo:555m")', 
                 )
@@ -152,7 +153,7 @@ class SomeRouterPostMiddleware(BaseMiddleware):
         
         return await handler(event, data)
 
-m_router.channel_post.outer_middleware(SomeRouterPostMiddleware())
+#m_router.channel_post.outer_middleware(SomeRouterPostMiddleware())
 #****************************************************
 
 class HasAdminStatusFilter(BaseFilter):
@@ -251,10 +252,9 @@ async def send_value2(callback: CallbackQuery):
     sufix = callback.data.split("_")[1]
     global List_data_channel_admin
     global Mode_select_channel_admin
-    global user_curent
     if List_data_channel_admin == []:
         List_data_channel_admin= inicialisiren_bot(callback.message.chat.id, True)
-    print(235, List_data_channel_admin, user_curent.codename)
+    #print(235, List_data_channel_admin)
 
     curent_channel= ["", "", ""] #[curent_channel1: str, curent_channel2: str, curent_channel3: str]
     for n in range(len(List_data_channel_admin)):
@@ -309,7 +309,7 @@ def get_inline_keyboard2(curent_channel_id: Optional[str] = ""):
 def get_inline_keyboard(curent_channel_id: Optional[str] = ""):
     buttons =[
             [InlineKeyboardButton(text="Прикрепить медиафайл", callback_data=f"repost_media_{curent_channel_id}")],
-            [InlineKeyboardButton(text="Добавить комментарии", callback_data="repost_plus"),
+            [InlineKeyboardButton(text="Добавить комментарии", callback_data="Continue_start"),
             InlineKeyboardButton(text="Предпросмотр", callback_data="PPP")],
             [InlineKeyboardButton(text="Добавить реакции", callback_data="Edit")],
             [InlineKeyboardButton(text="Добавить URL-кнопки", callback_data="Edit")],
@@ -406,8 +406,8 @@ async def run_repost_plus(callback: CallbackQuery):
     if (sufix == "clone") & (curent_channel_id == ""):
         #List_data_channel_admin=inicialisiren_bot(message.chat.id, True)
         for n in range(len(List_data_channel_admin)):
-            username_channel.append(List_data_channel_admin[n]["username_channel"])
-            id_channel.append(List_data_channel_admin[n]["id_channel"])
+            username_channel.append(List_data_channel_admin[n].username_channel)
+            id_channel.append(List_data_channel_admin[n].id_channel)
             button.append(InlineKeyboardButton(text=username_channel[n], callback_data=f"repost_create_{id_channel[n]}"))
 
         #(388, List_data_channel_admin, id_channel, callback.data)
@@ -570,17 +570,17 @@ async def forward_mess_clone(message: Message, base_url: str=base_url):
 def get_inline_keyboard_creat(curent_channel_id: Optional[str] = "", delet: Optional[int] = 0):
     buttons =[
             [InlineKeyboardButton(text="Прикрепить медиафайл", callback_data=f"post-create_media_{curent_channel_id}")],
-            [InlineKeyboardButton(text="Добавить комментарии", callback_data="post-create_plus"),
+            [InlineKeyboardButton(text="Добавить комментарии", callback_data="post-create_continue"),
             InlineKeyboardButton(text="Предпросмотр", callback_data="PPP")],
             [InlineKeyboardButton(text="Добавить реакции", callback_data="Edit")],
             [InlineKeyboardButton(text="Добавить URL-кнопки", callback_data="Edit")],
             [InlineKeyboardButton(text="Удалить сообщение", callback_data=f"post-create_delete_{curent_channel_id}"),
             InlineKeyboardButton(text="Далее", callback_data=f"post-create_continue_{curent_channel_id}")]
         ]
-    print(561, delet)
+    #print(561, delet)
     if delet != 0:
         buttons.pop(delet-1)
-        print(buttons)
+        #print(buttons)
     keyboard = InlineKeyboardMarkup(inline_keyboard=buttons)
     return keyboard
 
@@ -635,6 +635,7 @@ async def run_create(callback: CallbackQuery):
             text=f"Вышлите медиафайл",
             #show_alert=True
         )
+        print(637, Curent_Channal)
     elif (sufix == "edit") & (curent_channel_id != ""):
         await callback.message.answer(
                 f"""
@@ -661,7 +662,7 @@ async def run_create(callback: CallbackQuery):
         ])
         )
     elif (sufix == "okdelete") & (curent_channel_id != ""):
-        #await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-5 )
+        await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-5 )
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-4)
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-2 )
         await bot_post.delete_message(callback.message.chat.id, callback.message.message_id-1 )
@@ -709,22 +710,22 @@ async def run_create(callback: CallbackQuery):
 
 ##**********************************обработчик
 
-@m_router.message(~F.message & ((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика") & (F.text[:6] != "/promo") ))  # Echo to all messages except messages via bot
+@m_router.message(~F.message & (((F.text != "Настройки") & (F.text != "Заметки") & (F.text != "Контент-план") & (F.text != "Статистика") & (F.text[:6] != "/promo")) | ((F.text == None))))  # Echo to all messages except messages via bot
 async def echo_all(message: Message):
     global Curent_Channal
     global Cmozi
     global Create_message_id
     global message2
     #*********************************************************************
-    data = {
-        "url": "<N/A>",
-        "email": "<N/A>",
-        "code": "<N/A>"
-    }
-    entities1 = message.entities or []
-    for item in entities1:
-        if item.url != None:
-            data[item.url] = item.extract_from(message.text)
+    # data = {
+    #     "url": "<N/A>",
+    #     "email": "<N/A>",
+    #     "code": "<N/A>"
+    # }
+    # entities1 = message.entities or []
+    # for item in entities1:
+    #     if item.url != None:
+    #         data[item.url] = item.extract_from(message.text)
     #**********************************************************
     print("прилетело сюда", Curent_Channal)
     #print(538,Curent_Channal, 999, data)
