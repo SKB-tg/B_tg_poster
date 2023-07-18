@@ -145,14 +145,17 @@ class SomeRouterPostMiddleware(BaseMiddleware):
         data: Dict[str, Any]
     ) -> Any:
 
-
+        result=await handler(event, data)
         #print("Получил ---- POST", reply_markup_CH, event.message.message_id)# str(event.text).startswith("start"))
-        # if event.message.message_id event.message.reply_markup != None:
+        # if event.message != None:
+        #     try:
+        #     # await bot_post(EditMessageReplyMarkup(chat_id=Ch_id,
+        #     # message_id=event.message.message_id-1, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) ))
+        #         await event.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
+        #     except Exception as e:
+        #         print(e)
 
-        #     await bot_post(EditMessageReplyMarkup(chat_id=Ch_id,
-        #     message_id=event.message.message_id-1, reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) ))
-
-        return await handler(event, data)
+        return result
 
 _dispatcher.update.outer_middleware(SomeRouterPostMiddleware())
 #****************************************************
@@ -246,8 +249,10 @@ async def command_start(message: Message, base_url: str = base_url):
         [InlineKeyboardButton(text='Далее', callback_data=f'Continue_start')],
         ])
         )
-    await message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
-
+    try:
+        await message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
+    except Exception as e:
+        print(e)
 @m_router.callback_query(Text(startswith="Continue_"))
 async def send_value2(callback: CallbackQuery):
     sufix = callback.data.split("_")[1]
@@ -714,8 +719,10 @@ async def run_create(callback: CallbackQuery):
         )
         Curent_Channal={}
         #print(699,Curent_Channal, curent_channel_id)
-    await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
-
+    try:
+        await callback.message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
+    except Exception as e:
+        print(e)
 
 from aiogram.methods.edit_message_reply_markup import EditMessageReplyMarkup
 
@@ -800,8 +807,10 @@ async def echo_all(message: Message):
             message.text,
             reply_markup=get_inline_keyboard_creat(Curent_Channal["id_channel"])
         )
-    await message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
-
+        try:
+            await message.edit_reply_markup(reply_markup=InlineKeyboardMarkup(inline_keyboard=[]) )
+        except Exception as e:
+            print(e)
 
 #**************************************************************************
 @m_router.message(((F.text == "Настройки") | (F.Command == "settings"))) #(commands=["settings"])))  
