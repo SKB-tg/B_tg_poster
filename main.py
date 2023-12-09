@@ -516,6 +516,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 @m_router.message(F.forward_from_chat.type == "channel")#, flags={"data_time": {"event": True}})  # Echo to all messages except messages via bot
 async def forward_mess_clone(message: Message, base_url: str=base_url):
+    data_channel_source_new={}
     List_data_channel_source= inicialisiren_bot(message.chat.id, False)
     (474, message)
     for item in List_data_channel_source:
@@ -801,7 +802,7 @@ async def echo_all(message: Message):
     elif (message.text != None) & (message.entities.url != None):
 
         print(756, Curent_Channal["Create_message_id"], message.message_id)
-        await bot_post.delete_message(chat.id, message.message_id-1 )
+        await bot_post.delete_message(message.chat.id, message.message_id-1 )
 
         await message.answer(
             message.text,
