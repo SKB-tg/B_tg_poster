@@ -12,6 +12,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY *.py ./
 COPY app ./app
 #COPY createdb.sql ./
+EXPOSE 80
+EXPOSE 443
 
 ENTRYPOINT ["python", "main.py"]
 
